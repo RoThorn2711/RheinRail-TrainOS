@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-11-05",
+  "source": "OpenStreetMap · einzelne geprüfte Referenz, kein vollständiges Bahnhofsverzeichnis",
+  "licence": "© OpenStreetMap contributors, ODbL 1.0",
+  "stations": [
+    {"id":"osm-1600298350","name":"Fulda","position":{"lat":50.5547541,"lon":9.6843823},"source":"OSM","kind":"station","reference":true,"sourceUrl":"https://www.openstreetmap.org/node/1600298350"}
+  ]
+}
