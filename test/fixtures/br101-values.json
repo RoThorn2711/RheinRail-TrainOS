@@ -1,0 +1,83 @@
+{
+  "actor": {
+    "Result": "Success",
+    "Values": {
+      "ObjectClass": "RVM_CRG_DB_BR101_C"
+    }
+  },
+  "fields": {
+    "speed": {
+      "Result": "Success",
+      "Values": {
+        "Speed (ms)": 3.6512947190203704e-06
+      }
+    },
+    "clock": {
+      "Result": "Success",
+      "Values": {
+        "LocalTimeISO8601": "2000-01-01T10:00:00+01:00"
+      }
+    },
+    "sifa": {
+      "Result": "Success",
+      "Values": {
+        "WarningState": false,
+        "EnabledState": false
+      }
+    },
+    "zsOff": {
+      "Result": "Success",
+      "Values": {
+        "Enabled": 0
+      }
+    },
+    "highBrake": {
+      "Result": "Success",
+      "Values": {
+        "Result": 1
+      }
+    },
+    "force": {
+      "Result": "Success",
+      "Values": {
+        "Result": 0
+      }
+    },
+    "lzbActive": {
+      "Result": "Success",
+      "Values": {
+        "bIsActive": false
+      }
+    },
+    "lzbShowDistance": {
+      "Result": "Success",
+      "Values": {
+        "bShowDistance": false
+      }
+    },
+    "lzbDistance": {
+      "Result": "Success",
+      "Values": {
+        "Distance (m)": 0
+      }
+    },
+    "lzbTargetSpeed": {
+      "Result": "Success",
+      "Values": {
+        "Speed (ms)": 0
+      }
+    },
+    "lzbPermittedSpeed": {
+      "Result": "Success",
+      "Values": {
+        "Speed (ms)": 0
+      }
+    }
+  },
+  "lamp": {
+    "Result": "Success",
+    "Values": {
+      "Value": false
+    }
+  }
+}
