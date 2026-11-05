@@ -1,0 +1,79 @@
+{
+  "position": {
+    "lat": 50.54086944214969,
+    "lon": 9.689965626155091
+  },
+  "vehicle": "RVM_CRG_DB_BR101_C",
+  "vehicleId": "demo-br101",
+  "speed": 0.00027298504428472373,
+  "trackSpeed": 140.0000015258789,
+  "permittedSpeed": 140.0000015258789,
+  "speedSource": "TrackSpeedLimit",
+  "lzbActive": true,
+  "lzbPermittedSpeed": 140.0000015258789,
+  "pzbActive": false,
+  "service": "Anonymisierte API-Aufnahme",
+  "place": null,
+  "route": null,
+  "chainage": null,
+  "events": [
+    {
+      "id": "signal-0",
+      "kind": "signal",
+      "name": "Signal voraus",
+      "distance": 41.2538671875,
+      "aspect": "Clear",
+      "position": null,
+      "source": "TSW"
+    },
+    {
+      "id": "speed-0",
+      "kind": "speed",
+      "name": "Geschwindigkeitswechsel",
+      "distance": 1321.09453125,
+      "speed": 300.00000915527346,
+      "restriction": "TrackRuleSpeedLimit",
+      "position": null,
+      "source": "TSW"
+    },
+    {
+      "id": "signal-1",
+      "kind": "signal",
+      "name": "Signal voraus",
+      "distance": 1673.140625,
+      "aspect": "Clear",
+      "position": null,
+      "source": "TSW"
+    },
+    {
+      "id": "signal-2",
+      "kind": "signal",
+      "name": "Signal voraus",
+      "distance": 3841.2921875,
+      "aspect": "Clear",
+      "position": null,
+      "source": "TSW"
+    },
+    {
+      "id": "signal-3",
+      "kind": "signal",
+      "name": "Signal voraus",
+      "distance": 6082.758125,
+      "aspect": "Clear",
+      "position": null,
+      "source": "TSW"
+    }
+  ],
+  "heading": null,
+  "trail": [
+    [
+      50.54086944214969,
+      9.689965626155091
+    ]
+  ],
+  "connected": true,
+  "updatedAt": 0,
+  "headingSource": "GPS-Bewegungsrichtung",
+  "distanceUnit": "DriverAid: cm → m",
+  "recorded": true
+}
