@@ -1,0 +1,14 @@
+{
+  "Result": "Success",
+  "Values": {
+    "markers": [
+      {
+        "markerName": "Fulda Gleis 356",
+        "stationName": "Fulda Gleis 356",
+        "markerType": "Destination",
+        "distanceToStationCM": 18193.2109375
+      }
+    ],
+    "stations": []
+  }
+}

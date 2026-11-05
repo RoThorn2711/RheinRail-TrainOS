@@ -1,0 +1,205 @@
+{
+  "description": "Minimized measurement values; timestamps, identifiers and context removed.",
+  "samples": [
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 0.6633602976799011
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 15501.060546875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 1.0344139337539673
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 18747.224609375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 1.4784590005874634
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 20982.76953125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 1.9736907482147217
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 22027.076171875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 2.5086519718170166
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 22118.814453125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 2.995901107788086
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 22092.765625
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 3.535069704055786
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 22060.89453125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 4.055586814880371
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 22022.83203125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 4.574662685394287
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 21983.05078125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 5.0446977615356445
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": 9132.7880859375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 5.234522342681885
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -6360.5380859375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 5.214179515838623
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -24711.2578125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 5.0526041984558105
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -43510.80859375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 4.800290107727051
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -61792.85546875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 4.4209818840026855
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -80565.390625
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 3.93027925491333
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -98901.6015625
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 3.3284153938293457
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -118804.625
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 2.659816265106201
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -114450.921875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 2.042034864425659
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -83343.4296875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 1.5573837757110596
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -55372.8984375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 1.2197363376617432
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -36882.796875
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 0.9940241575241089
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -21832.142578125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 0.8520799875259399
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -13306.912109375
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 0.7593024373054504
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -8473.986328125
+      }
+    },
+    {
+      "CurrentDrivableActor.Function.HUD_GetSpeed": {
+        "Speed (ms)": 0.6575224995613098
+      },
+      "CurrentDrivableActor/Simulation/MFA_TractiveEffort_N.Result": {
+        "Result": -3162.308837890625
+      }
+    }
+  ]
+}

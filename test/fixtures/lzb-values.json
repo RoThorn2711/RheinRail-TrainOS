@@ -1,0 +1,44 @@
+{
+  "LZB_GetTargetSpeedDistance": {
+    "Result": "Success",
+    "Values": {
+      "Distance (m)": 4000
+    }
+  },
+  "LZB_GetExpectedTargetSpeed": {
+    "Result": "Success",
+    "Values": {
+      "Speed (ms)": 27.77777862548828
+    }
+  },
+  "LZB_GetMaxPermissibleSpeed": {
+    "Result": "Success",
+    "Values": {
+      "Speed (ms)": 27.77777862548828
+    }
+  },
+  "LZB_GetMonitoringSpeed": {
+    "Result": "Success",
+    "Values": {
+      "Speed (ms)": 30.20833396911621
+    }
+  },
+  "LZB_GetShowLZBDistanceBare": {
+    "Result": "Success",
+    "Values": {
+      "bShowDistance": true
+    }
+  },
+  "LZB_GetIsActive": {
+    "Result": "Success",
+    "Values": {
+      "bIsActive": true
+    }
+  },
+  "LZB_GetIsReady": {
+    "Result": "Success",
+    "Values": {
+      "bIsReady": true
+    }
+  }
+}

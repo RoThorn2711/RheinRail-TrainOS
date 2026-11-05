@@ -1,0 +1,39 @@
+{
+  "Result": "Success",
+  "Values": {
+    "trackMaxSpeed": {
+      "value": 38.88888931274414
+    },
+    "speedLimit": {
+      "value": 38.88888931274414
+    },
+    "currentSpeedLimitSource": "TrackSpeedLimit",
+    "nextSpeedLimits": [
+      {
+        "value": {
+          "value": 83.33333587646484
+        },
+        "distanceToNextSpeedLimit": 167474.328125,
+        "restrictionType": "TrackRuleSpeedLimit"
+      }
+    ],
+    "nextSignals": [
+      {
+        "value": "Clear",
+        "distanceToNextSignal": 39490.2578125
+      },
+      {
+        "value": "Clear",
+        "distanceToNextSignal": 202678.9375
+      },
+      {
+        "value": "Clear",
+        "distanceToNextSignal": 419494.15625
+      },
+      {
+        "value": "Clear",
+        "distanceToNextSignal": 643640.8125
+      }
+    ]
+  }
+}
