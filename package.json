@@ -1,0 +1,15 @@
+{
+  "name": "rheinrail-trainos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local companion dashboard for Train Sim World 7",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
