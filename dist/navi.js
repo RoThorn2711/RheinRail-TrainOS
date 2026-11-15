@@ -1,3 +1,4 @@
+import {liveDisplays} from './vehicle-profiles.js';
 import {RouteStrip} from './route-strip.js';
 const $=s=>document.querySelector(s),L=window.L;
 let prefs={mode:'follow',zoom:15,source:'live',band:0};try{prefs={...prefs,...JSON.parse(localStorage.getItem('rheinrail-navi')||'{}')};}catch{}
@@ -22,7 +23,10 @@ $('#full').onclick=async()=>{try{if(document.fullscreenElement)await document.ex
 $('#infoButton').onclick=()=>$('#info').showModal();$('#closeCard').onclick=()=>{$('#card').hidden=true;selection=null;};
 function card(e){selection=e.id;$('#card').hidden=false;$('#cardSource').textContent=e.source==='OSM'?'OPENSTREETMAP · REALE WELT':prefs.source==='demo'?'TSW-AUFNAHME · KEIN LIVE-STATUS':'TSW HTTP API · LIVE';$('#cardTitle').textContent=e.name;const parts=[];if(Number.isFinite(e.distance))parts.push('Voraus: '+dist(e.distance));if(Number.isFinite(e.speed))parts.push('Geschwindigkeit: '+fmt(e.speed)+' km/h');if(e.aspect)parts.push('Signalzustand: '+e.aspect);if(e.restriction)parts.push('Typ: '+e.restriction);if(e.source==='OSM')parts.push((e.reference?'Gespeicherte, geprüfte OSM-Referenz. ':'Realer Bahnhof. ')+'Zuordnung zur TSW-Strecke nicht bestätigt.');if(!e.position)parts.push('Die API liefert dafür keine bestätigte GPS-Position. Anzeige im Streckenband; kein erfundener Kartenpunkt.');$('#cardText').textContent=parts.join('\n');if(e.position){setMode('free');map.flyTo([e.position.lat,e.position.lon],Math.max(map.getZoom(),16),{duration:.7});}}
 const routeStrip=new RouteStrip($('#band'),{onSelect:card,onResize:()=>map.invalidateSize()});
-function render(incoming){const stale=!incoming.connected||Date.now()-incoming.updatedAt>5000;data=stale?{...incoming,position:null,speed:null,trackSpeed:null,permittedSpeed:null,lzbPermittedSpeed:null,lzbActive:null,pzbActive:null,events:[],trail:[],heading:null}:incoming;
+function render(incoming){
+ const allowed=prefs.source==='live'&&incoming.connected&&Date.now()-incoming.updatedAt<=5000?liveDisplays(incoming.vehicle):[];
+ for(const option of $('#display').options)option.disabled=prefs.source==='live'&&option.value!=='navi'&&!allowed.includes(option.value);
+const stale=!incoming.connected||Date.now()-incoming.updatedAt>5000;data=stale?{...incoming,position:null,speed:null,trackSpeed:null,permittedSpeed:null,lzbPermittedSpeed:null,lzbActive:null,pzbActive:null,events:[],trail:[],heading:null}:incoming;
  const demo=prefs.source==='demo';$('#status').textContent=demo?'AUFNAHME / DEMO':incoming.pending&&stale?'VERBINDUNG…':stale?'OFFLINE':data.position?'LIVE GPS':'LIVE · KEIN GPS';$('#status').className=stale?'offline':'';
  $('#vehicle').textContent=(data.vehicle||'Fahrzeug unbekannt').replace(/^RVM_CRG_DB_/,'').replace(/_C$/,'').replaceAll('_',' ');
  $('#speed').replaceChildren(document.createTextNode(fmt(data.speed)+' '));const unit=document.createElement('em');unit.textContent='km/h';$('#speed').append(unit);

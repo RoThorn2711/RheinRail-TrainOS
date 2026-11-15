@@ -45,3 +45,17 @@ Reale Hintergrundkarte und optionale Bahnhofsdaten: OpenStreetMap. Sie können v
 ## Grenzen der Verifikation
 
 Die lokalen Browserprüfungen umfassten Live-Fahrt, relative Signalbewegung, die zwei Instrumentenansichten, Kartenmodi, Scroll-/Zoom-Verhalten und ein iPad-Layout. Ein physischer Mehrgerätetest und Langzeit-/Sonderzustandsprüfungen bleiben offen. Die enthaltenen Testfixtures sind bereinigt und minimiert; die vertraulichen Rohdiagnosen werden nicht mitgeliefert.
+
+## 145 Expert – vorläufige Live-Zuordnungen
+
+`/api/state?profile=br145` verwendet einen getrennten Cache. Die Fahrzeugklasse muss die Nummer 145 enthalten; Klasse und VehicleID werden nach der Messung erneut geprüft. Die Erkennung unterscheidet die Fahrzeugfamilie, bestätigt aber keine bestimmte Expert-Ausführung.
+
+Der Adapter fragt die oben dokumentierten, ausschließlich lesenden Verträge für Kraft, Sifa, ZS, LZB sowie die benannten `MFA_Indicators`-Flags ab. Nur Antworten mit passenden numerischen beziehungsweise booleschen Schlüsseln werden übernommen. Diese Verträge stammen aus der vorhandenen BR-101-Implementierung und sind für die BR 145 **noch nicht im Spiel bestätigt**. Gleiche Pfad- und Schlüsselnamen garantieren nicht dieselbe physikalische Bedeutung. Insbesondere Kraftvorzeichen und Kraft pro Fahrmotor müssen mit der 145 verglichen werden. Keine automatische Suche nach oder Ausführung von Fahrzeug-Steuerfunktionen.
+
+Fehlende Endpunkte werden 30 Sekunden zwischengespeichert und danach erneut geprüft. Fehlende, ungültige oder veraltete Messwerte bleiben leer; keine Demo-Werte bei Verbindungsverlust. Leuchtmelder übernehmen Active-, Flashing- und Inhibited-Zustände aus der vorhandenen Ableitung. Unbestätigte zusätzliche Melder (Tür, elektrische Bremse, Hauptschalter, Notbremse) bleiben unbekannt/dunkel.
+
+In den Einstellungen kann eine begrenzte 145-Diagnose heruntergeladen werden. Sie enthält ausschließlich Fahrzeugklasse, benannte Messpfade mit dekodierten Messwerten und die ausgewählten booleschen Melderflags. Sie enthält keinen Schlüssel, Benutzerpfad, VehicleID oder vollständige API-Antwort. Synthetische Tests prüfen die Verarbeitung; reale Fahrzeugaufnahmen stehen noch aus.
+
+## Profilfreigabe
+
+`dist/vehicle-profiles.js` ist die gemeinsame Freigabelogik für Server, Instrumente und Navigator-Menü. `/api/state?profile=mfd` gibt ausschließlich das ETCS-101-Profil frei, `profile=mfa` das analoge 101-Expert-Profil und `profile=br145` die 145-Familie einschließlich NV-Namensvarianten. Ohne Profilparameter gilt `mfd`. Eine falsche Profilanfrage liefert `supported:false`, leere `fields` und die aktuelle Liste `availableDisplays`. Veraltete oder nicht verbundene Zustände schalten keine Anzeige frei. Browserseitig wird dieselbe Regel zusätzlich geprüft und bei einem erkannten Fahrzeugwechsel die passende Ansicht aktiviert.

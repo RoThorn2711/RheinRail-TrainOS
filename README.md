@@ -1,5 +1,9 @@
 # RheinRail TrainOS
 
+**Version 1.1.0** · BR 145 Expert MFA, farbige Leuchtmelder und automatische Fahrzeugfreigabe.
+
+[Downloads und Releases](https://github.com/RoThorn2711/RheinRail-TrainOS/releases) · [Änderungen in v1.1.0](docs/releases/v1.1.0.md)
+
 <p align="center"><img src="docs/brand-banner.svg" width="420" alt="RAINRAIL – Projektlogo"></p>
 
 Lokales Companion-Dashboard für **Train Sim World 7**: digitale und analoge BR-101-Expert-Anzeigen, eine GPS-Karte und ein grafisches Hybrid-Streckenband. Ein lokaler HTTP-Adapter liest die verfügbaren Spieldaten und stellt die Oberfläche für PC und Tablets bereit.
@@ -161,7 +165,7 @@ npm test
 
 Die Tests laufen ohne TSW, echte Schlüsseldatei oder zusätzliche Pakete. Sie prüfen unter anderem Einheiten, ungültige und veraltete Werte, Fahrzeugwechsel, beide Expert-Kennungen, die Instrumentenanzeige, Blinklogik, GPS-Kursberechnung und die maßstäbliche Platzierung sowie begrenzte Geschwindigkeitsintervalle im Streckenband.
 
-Die getestete Ausgangsfassung enthält **24 bestandene Tests**. Browserprüfungen ersetzen keinen vollständigen Fahr-, Geräte- oder Langzeittest.
+Version 1.1.0 enthält **35 bestandene Node-Tests**. Die neuen 145- und Fahrzeugfreigabeprüfungen verwenden synthetische API-Antworten. Browserprüfungen ersetzen keinen vollständigen Fahr-, Geräte- oder Langzeittest.
 
 ## Bekannte Probleme und geplante Erweiterungen
 
@@ -177,3 +181,23 @@ Die getestete Ausgangsfassung enthält **24 bestandene Tests**. Browserprüfunge
 Für den projektspezifischen Code ist zunächst **keine allgemeine Open-Source-Lizenz erteilt**. Die Rechte an Marken, Nachbildungen und Referenzmaterial sind separat zu prüfen; eine fehlende Projektlizenz klärt diese Rechte nicht. Als spätere Lizenz für die eigenen, geklärten Codebestandteile wird MIT vorgeschlagen.
 
 Leaflet behält seine BSD-2-Clause-Lizenz, OSM-Inhalte ihre jeweiligen Bedingungen. Siehe [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) und [RIGHTS.md](RIGHTS.md). Die Sichtbarkeit auf GitHub allein macht das Projekt nicht zu frei lizenzierter Open-Source-Software.
+
+## 145 Expert
+
+In der Anzeigeauswahl `145 Expert` wählen. Demo bietet Geschwindigkeit, Kraft, Sifa und LZB-Zielwerte. `TSW Live` fragt zusätzlich zu Geschwindigkeit/Spielzeit die benannten lesenden Verträge für Kraft, ZS, Sifa, PZB-/LZB-Leuchtmelder und LZB-Zielanzeigen ab. Die Zuordnung ist **vorläufig und noch nicht mit echten BR-145-API-Antworten verifiziert**; sie verwendet bekannte Verträge der bestehenden Instrumentenanbindung. Nicht angebotene oder ungültige Werte bleiben leer. Tür-, Hauptschalter-, Notbrems- und elektrische Bremsmelder haben noch keine bestätigte Zuordnung.
+
+Nach einem Update die alte Serverinstanz schließen und `Start.cmd` erneut starten. Stimmen Live-Anzeigen nicht oder bleiben Werte unverfügbar: unter Einstellungen `145-Diagnose herunterladen` wählen. Die Datei enthält nur ausgewählte API-Felder/Messwerte und die Fahrzeugklasse; keinen Schlüssel oder Benutzerpfad. Sie dient dazu, die tatsächlich benötigten 145-Zuordnungen zu bestimmen.
+
+Aktuelle lokale Prüfung: 35 bestandene Node-Tests sowie Browserprüfungen mit synthetischen API-Antworten (Live/Demo, Kraft, Sifa, Melder, LZB, Verbindungsverlust, Diagnose-Download). Ein echter TSW-Fahrtest steht aus.
+
+## Automatische Fahrzeugfreigabe im Live-Modus
+
+| TSW-Fahrzeugkennung | Freigegebene Instrumentenansicht |
+| --- | --- |
+| `RVM_CRG_DB_BR101_ETCS_C` | BR 101 MFD |
+| `RVM_CRG_DB_BR101_C` | BR 101 MFA |
+| Klasse mit der Baureihennummer `145` (auch NV) | 145 Expert MFA |
+
+Im Live-Modus wechselt die Instrumentenseite automatisch zur passenden Ansicht. Andere Instrumentenoptionen werden deaktiviert; der Navigator bleibt erreichbar. Dieselben Freigaben gelten im Navigator-Menü und in den API-Antworten bei direkten Profilanfragen. Ohne aktuelle Fahrzeugerkennung bleiben Instrumentenoptionen gesperrt. Demo lässt alle Ansichten frei auswählbar.
+
+Die beiden 101-Kennungen sind aus vorhandenen Fahrzeugaufnahmen bekannt. Für die normalen und NV-145-Varianten sind die vollständigen realen Klassennamen noch nicht separat aufgezeichnet; getestet wurden synthetische Klassennamen mit `145` beziehungsweise `145_NV`. Sollte eine Variante gesperrt bleiben, ist die tatsächliche Fahrzeugklasse zur Ergänzung erforderlich.

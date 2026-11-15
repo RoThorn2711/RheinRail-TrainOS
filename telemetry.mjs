@@ -1,3 +1,4 @@
+import {liveDisplays} from './dist/vehicle-profiles.js';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {homedir} from 'node:os';
@@ -19,10 +20,10 @@ export const mappings={
  lzbPermittedSpeed:{path:'CurrentDrivableActor/LZB.Function.LZB_GetMaxPermissibleSpeed',key:'Speed (ms)'},
 };
 export async function keyFile(){return process.env.TSW_KEY_FILE||join(process.env.USERPROFILE||homedir(),'Documents','My Games','TrainSimWorld7','Saved','Config','CommAPIKey.txt');}
-export async function request(route){
+export async function request(route,{timeoutMs=3500,attempts=2}={}){
  const key=(await readFile(await keyFile(),'utf8')).trim();
  // The game sometimes resets an idle TCP connection; retry GET once with a fresh connection.
- for(let attempt=0;attempt<2;attempt++){try{const response=await fetch(`${API}/${route}`,{headers:{DTGCommKey:key,Connection:'close'},signal:AbortSignal.timeout(3500)});if(!response.ok)throw Error(`TSW HTTP ${response.status}`);const data=await response.json();if(data.Result&&data.Result!=='Success')throw Error('TSW liefert keinen gültigen Wert');return data;}catch(error){if(attempt===1)throw error;}}
+ for(let attempt=0;attempt<attempts;attempt++){try{const response=await fetch(`${API}/${route}`,{headers:{DTGCommKey:key,Connection:'close'},signal:AbortSignal.timeout(timeoutMs)});if(!response.ok)throw Error(`TSW HTTP ${response.status}`);const data=await response.json();if(data.Result&&data.Result!=='Success')throw Error('TSW liefert keinen gültigen Wert');return data;}catch(error){if(attempt===attempts-1)throw error;}}
 }
 export function decode(name,values){let v=values?.[mappings[name].key];switch(name){case 'speed':case 'lzbTargetSpeed':case 'lzbPermittedSpeed':return typeof v==='number'&&Number.isFinite(v)?Math.abs(v)*3.6:null;case 'lzbDistance':return typeof v==='number'&&Number.isFinite(v)&&v>=0?v:null;case 'lzbActive':case 'lzbShowDistance':return typeof v==='boolean'?v:null;case 'force':return typeof v==='number'&&Number.isFinite(v)?(Math.abs(v)<1?0:v/1000):null;case 'clock':return typeof v==='string'&&/T\d{2}:\d{2}:\d{2}/.test(v)?v.split('T')[1].slice(0,8):null;case 'sifa':return typeof v==='boolean'&&typeof values.EnabledState==='boolean'?v||!values.EnabledState:null;case 'zsOff':return v===0?true:v===1?false:null;case 'highBrake':return v===0?false:v===1?true:null;default:return null;}}
 
@@ -67,4 +68,60 @@ export async function collect(read=request){
  const endIdentity=await read('get/CurrentDrivableActor.ObjectClass');if(endIdentity.Values?.ObjectClass!==vehicle)throw Error('Fahrzeugwechsel · erneut verbinden');
  fields.lamps={value:deriveIndicators(indicators),at:Date.now()};
  return {connected:true,supported:true,vehicle,build:info.Meta?.GameBuildNumber,startedAt,updatedAt:Date.now(),fields,message:'Live · Geschwindigkeit, Zug-/Bremskraft, Meldeleuchten und LZB-Zielanzeigen.'};
+}
+
+// Provisional BR 145 mapping: probe only the named read-only contracts already
+// used by the adapter. A matching response shape is not in-game verification.
+// Failed optional paths are retried after 30 seconds, not on every browser poll.
+const optional145Failures=new WeakMap();
+export async function collect145(read=request){
+ const startedAt=Date.now();
+ const info=await read('info');
+ const actor=await read('get/CurrentDrivableActor.ObjectClass');
+ const vehicle=actor.Values?.ObjectClass;
+ const fields={};
+ if(!liveDisplays(vehicle).includes('br145'))return {connected:true,supported:false,vehicle,fields,updatedAt:Date.now(),message:'145 Expert: aktuelles Fahrzeug nicht als BR 145 erkannt. Live-Werte ausgeblendet.'};
+ const identity=await read('get/CurrentDrivableActor.VehicleID');
+ const vehicleId=identity.Values?.VehicleID;
+ if(typeof vehicleId!=='string'||!vehicleId)throw Error('Unbekannte Fahrzeugidentität');
+ const cacheKey=vehicle+':'+vehicleId;
+ let cache=optional145Failures.get(read);
+ if(!cache||cache.key!==cacheKey){cache={key:cacheKey,failures:new Map()};optional145Failures.set(read,cache);}
+ const indicators={};
+ const diagnostics={profile:'br145',mapping:'provisional',vehicle,fields:{},lamps:{},missing:[]};
+ async function optional(route,cacheFailure=true){
+  const failedAt=cache.failures.get(route);
+  if(cacheFailure&&failedAt!==undefined&&Date.now()-failedAt<30000)return null;
+  try{const result=await read(route,{timeoutMs:750,attempts:1});cache.failures.delete(route);return result;}
+  catch{if(cacheFailure)cache.failures.set(route,Date.now());return null;}
+ }
+ const tasks=[...Object.keys(mappings),...indicatorNames.map(n=>'lamp:'+n)];
+ await boundedMap(tasks,async name=>{
+  const at=Date.now();
+  if(name.startsWith('lamp:')){
+   const property=name.slice(5),path='CurrentDrivableActor/MFA_Indicators.Property.'+encodeURIComponent(property);
+   const response=await optional('get/'+path);
+   indicators[property]=typeof response?.Values?.Value==='boolean'?response.Values.Value:null;
+   diagnostics.lamps[property]={path,value:indicators[property]};
+  }else{
+   const path=mappings[name].path;
+   const response=await optional('get/'+path,name!=='speed'&&name!=='clock');
+   const value=decode(name,response?.Values);
+   fields[name]={value,at,...(value===null?{error:response?'Antwortformat nicht passend':'API-Pfad nicht verfügbar'}:{})};
+   diagnostics.fields[name]={path,key:mappings[name].key,unit:mappings[name].unit||null,value,error:fields[name].error||null};
+  }
+ });
+ const after=await read('get/CurrentDrivableActor.ObjectClass');
+ const afterId=await read('get/CurrentDrivableActor.VehicleID');
+ if(after.Values?.ObjectClass!==vehicle||afterId.Values?.VehicleID!==vehicleId)throw Error('Fahrzeugwechsel · erneut verbinden');
+ // Old properties must not be stamped fresh after a slow capability scan.
+ const at=startedAt;
+ fields.lamps={value:deriveIndicators(indicators),at};
+ const fresh=f=>f.value!==null&&Date.now()-f.at<=5000;
+ for(const [name,field] of Object.entries(fields))if(name!=='lamps'&&!fresh(field))diagnostics.missing.push(name);
+ for(const [name,lamp] of Object.entries(fields.lamps.value))if(lamp.on===null||Date.now()-at>5000)diagnostics.missing.push('lamp:'+name);
+ const available=Object.keys(mappings).filter(name=>fresh(fields[name]));
+ const partial=diagnostics.missing.length>0;
+ const message='145 Expert · vorläufige Live-Zuordnungen. Verfügbar: '+(available.join(', ')||'keine Messwerte')+'. '+(partial?'Fehlende Werte bleiben ausgeblendet. Bei fehlenden Anzeigen die 145-Diagnose herunterladen.':'Kraft, Melder und LZB bitte mit dem Spiel vergleichen; noch nicht im Spiel verifiziert.');
+ return {connected:true,supported:true,partial,provisional:true,vehicle,build:info.Meta?.GameBuildNumber,fields,startedAt,updatedAt:Date.now(),diagnostics,message};
 }

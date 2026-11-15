@@ -1,0 +1,57 @@
+name: Test and publish release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify tag, version and release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          test "$RELEASE_TAG" = "v$(node -p 'JSON.parse(require("fs").readFileSync("package.json", "utf8")).version')"
+          test -s "docs/releases/${RELEASE_TAG}.md"
+      - name: Test
+        run: npm test
+      - name: Build ZIP and checksum from the tagged commit
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ARCHIVE="RheinRail-TrainOS-${RELEASE_TAG}.zip"
+          git archive --format=zip --prefix=RheinRail-TrainOS/ --output="$ARCHIVE" HEAD
+          unzip -t "$ARCHIVE"
+          sha256sum "$ARCHIVE" > "$ARCHIVE.sha256"
+      - name: Publish release with ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ARCHIVE="RheinRail-TrainOS-${RELEASE_TAG}.zip"
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$ARCHIVE" "$ARCHIVE.sha256" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$ARCHIVE" "$ARCHIVE.sha256" \
+              --verify-tag --latest \
+              --title "RheinRail TrainOS ${RELEASE_TAG} – 145 Expert & Fahrzeugerkennung" \
+              --notes-file "docs/releases/${RELEASE_TAG}.md"
+          fi
