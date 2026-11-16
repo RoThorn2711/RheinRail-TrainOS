@@ -25,7 +25,7 @@ function card(e){selection=e.id;$('#card').hidden=false;$('#cardSource').textCon
 const routeStrip=new RouteStrip($('#band'),{onSelect:card,onResize:()=>map.invalidateSize()});
 function render(incoming){
  const allowed=prefs.source==='live'&&incoming.connected&&Date.now()-incoming.updatedAt<=5000?liveDisplays(incoming.vehicle):[];
- for(const option of $('#display').options)option.disabled=prefs.source==='live'&&option.value!=='navi'&&!allowed.includes(option.value);
+ for(const option of $('#display').options)option.disabled=prefs.source==='live'&&option.value!=='navi'&&option.value!=='ice3'&&option.value!=='icet'&&!allowed.includes(option.value);
 const stale=!incoming.connected||Date.now()-incoming.updatedAt>5000;data=stale?{...incoming,position:null,speed:null,trackSpeed:null,permittedSpeed:null,lzbPermittedSpeed:null,lzbActive:null,pzbActive:null,events:[],trail:[],heading:null}:incoming;
  const demo=prefs.source==='demo';$('#status').textContent=demo?'AUFNAHME / DEMO':incoming.pending&&stale?'VERBINDUNG…':stale?'OFFLINE':data.position?'LIVE GPS':'LIVE · KEIN GPS';$('#status').className=stale?'offline':'';
  $('#vehicle').textContent=(data.vehicle||'Fahrzeug unbekannt').replace(/^RVM_CRG_DB_/,'').replace(/_C$/,'').replaceAll('_',' ');

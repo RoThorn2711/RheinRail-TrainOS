@@ -1,0 +1,52 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {collectIceT} from './telemetry.mjs';
+import {normalizeLive} from './dist/sources.js';
+import {readFile} from 'node:fs/promises';
+test('recorded ICE T GNT service keeps enabled, ready and active separate',async()=>{
+ const fixture=JSON.parse(await readFile(new URL('./test/fixtures/icet-gnt-components.json',import.meta.url),'utf8'));
+ let enabled=true,active=false;
+ const calls=[],read=async route=>{
+  calls.push(route);
+  if(route==='info')return {};
+  if(route.endsWith('ObjectClass'))return {Values:{ObjectClass:fixture.vehicle}};
+  if(route.endsWith('VehicleID'))return {Values:{VehicleID:'test-actor'}};
+  if(route==='list/CurrentDrivableActor')return {Nodes:[{Name:'GNT_Service'}],Endpoints:[]};
+  if(route==='list/'+fixture.path)return {Endpoints:fixture.endpoints.map(Name=>({Name,Writable:false}))};
+  if(route.startsWith('list/'))return {Endpoints:[]};
+  if(route.endsWith('GNT_Service.Property.bIsEnabled'))return {Values:{Value:enabled}};
+  if(route.endsWith('GNT_Service.Property.bIsReady'))return {Values:{Value:true}};
+  if(route.endsWith('GNT_Service.Property.bIsActivated'))return {Values:{Value:active}};
+  if(route.endsWith('HUD_GetSpeed'))return {Values:{'Speed (ms)':0}};
+  if(route==='get/TimeOfDay.Data')return {Values:{LocalTimeISO8601:'2026-11-16T11:00:36Z'}};
+  throw Error('Unavailable');
+ };
+ let raw=await collectIceT(read),data=normalizeLive(raw);
+ assert.equal(data.gntEnabled,true);assert.equal(data.gntMonitoringActive,false);assert.equal(data.lamps.GNT.on,true);assert.equal(data.gntActive,true);
+ for(const endpoint of fixture.endpoints)assert.ok(calls.includes('get/'+fixture.path+'.'+endpoint));
+ enabled=false;active=false;data=normalizeLive(await collectIceT(read));assert.equal(data.gntEnabled,false);assert.equal(data.gntReady,true);assert.equal(data.lamps.GNT.on,false);
+ assert.equal(normalizeLive({...raw,updatedAt:1},10000).gntEnabled,null);
+});
+test('ICE T reads GNT flags from advertised MFA indicators and exposes live status',async()=>{
+ let active=true,inhibit=false;
+ const read=async route=>{
+  if(route==='info')return {};
+  if(route.endsWith('ObjectClass'))return {Values:{ObjectClass:'RVM_TEST_BR411_C'}};
+  if(route.endsWith('VehicleID'))return {Values:{VehicleID:'actor'}};
+  if(route==='list/CurrentDrivableActor')return {Nodes:[{Name:'MFA_Indicators'},{Name:'GNT_Service'}],Endpoints:[]};
+  if(route==='list/CurrentDrivableActor/MFA_Indicators')return {Endpoints:['GNT_IsActive','GNT_IsFlashing','GNT_IsInhibited'].map(n=>({Name:'Property.'+n,Writable:false}))};
+  if(route==='list/CurrentDrivableActor/GNT_Service')return {Endpoints:[{Name:'Property.IsActive',Writable:false},{Name:'Function.SetEnabled',Writable:false}]};
+  if(route.startsWith('list/'))return {Endpoints:[]};
+  if(route.endsWith('Property.GNT_IsActive'))return {Values:{Value:active}};
+  if(route.endsWith('Property.GNT_IsFlashing'))return {Values:{Value:false}};
+  if(route.endsWith('Property.GNT_IsInhibited'))return {Values:{Value:inhibit}};
+  if(route.endsWith('Property.IsActive')||route.endsWith('SetEnabled'))throw Error('Control state must never be used as lamp');
+  if(route.endsWith('HUD_GetSpeed'))return {Values:{'Speed (ms)':10}};
+  if(route==='get/TimeOfDay.Data')return {Values:{LocalTimeISO8601:'2026-11-16T13:00:00Z'}};
+  throw Error('Unavailable');
+ };
+ let data=normalizeLive(await collectIceT(read));assert.equal(data.gntActive,true);assert.equal(data.lamps.GNT.on,true);
+ active=false;data=normalizeLive(await collectIceT(read));assert.equal(data.gntActive,false);assert.equal(data.lamps.GNT.on,false);
+ active=true;inhibit=true;data=normalizeLive(await collectIceT(read));assert.equal(data.gntActive,false);
+ assert.equal(normalizeLive({connected:false}).gntActive,null);
+});

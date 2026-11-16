@@ -59,3 +59,10 @@ In den Einstellungen kann eine begrenzte 145-Diagnose heruntergeladen werden. Si
 ## Profilfreigabe
 
 `dist/vehicle-profiles.js` ist die gemeinsame Freigabelogik für Server, Instrumente und Navigator-Menü. `/api/state?profile=mfd` gibt ausschließlich das ETCS-101-Profil frei, `profile=mfa` das analoge 101-Expert-Profil und `profile=br145` die 145-Familie einschließlich NV-Namensvarianten. Ohne Profilparameter gilt `mfd`. Eine falsche Profilanfrage liefert `supported:false`, leere `fields` und die aktuelle Liste `availableDisplays`. Veraltete oder nicht verbundene Zustände schalten keine Anzeige frei. Browserseitig wird dieselbe Regel zusätzlich geprüft und bei einem erkannten Fahrzeugwechsel die passende Ansicht aktiviert.
+
+
+## ICE 1 – vorläufige Live-Zuordnungen
+
+`/api/state?profile=ice1` verwendet einen getrennten Cache und prüft ICE-1-/BR-401-Klassennamen sowie die VehicleID vor und nach jeder Messung. Die Funktion `collectIce1` fragt ausschließlich bekannte lesende Verträge ab. ZS und hohe Abbremsung werden für dieses Profil nicht abgefragt. Keine ungeprüfte Übernahme von Messungen eines anderen Fahrzeugs.
+
+Geschwindigkeit, Uhrzeit, Kraft, Sifa, PZB und LZB sind angeschlossen, aber noch nicht mit dem realen ICE-1-API-Verhalten verglichen. Passende Antwortformate werden als vorläufige Zuordnungen ausgewiesen. Kraftbezugsgröße und Vorzeichen müssen im Spiel überprüft werden. Ein Diagnose-Download in den Einstellungen hilft bei fehlenden Feldern. Die automatisierten Tests verwenden synthetische API-Antworten und belegen keine In-Game-Verifikation.

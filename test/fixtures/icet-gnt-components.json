@@ -1,0 +1,9 @@
+{
+  "vehicle": "RVM_FTF_DB_BR411_TW_0_C",
+  "path": "CurrentDrivableActor/GNT_Service",
+  "endpoints": [
+    "Property.bIsEnabled",
+    "Property.bIsActivated",
+    "Property.bIsReady"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "rheinrail-trainos",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Local companion dashboard for Train Sim World 7",

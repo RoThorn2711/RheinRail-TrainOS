@@ -1,3 +1,7 @@
+import {resolveIceTMappings} from './icet-mappings.mjs';
+import {resolveIce3Mappings,decodeIce3} from './ice3-mappings.mjs';
+import {collectIce1Profile} from './ice1-telemetry.mjs';
+import {readMappedField} from './telemetry-read.mjs';
 import {liveDisplays} from './dist/vehicle-profiles.js';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -63,39 +67,45 @@ export async function collect(read=request){
  const startedAt=Date.now();const info=await read('info');const identity=await read('get/CurrentDrivableActor.ObjectClass');const vehicle=identity.Values?.ObjectClass;const fields={};
  if(!supportedClasses.has(vehicle))return {connected:true,supported:false,vehicle,build:info.Meta?.GameBuildNumber,updatedAt:Date.now(),fields,message:'Fahrzeugprofil nicht bestätigt. Live-Werte werden ausgeblendet.'};
  // Bounded parallel reads keep the complete lamp sample fast enough for live operation.
- const indicators={};await boundedMap([...Object.keys(mappings),...indicatorNames.map(n=>'lamp:'+n)],async name=>{if(name.startsWith('lamp:')){const n=name.slice(5);try{const r=await read('get/CurrentDrivableActor/MFA_Indicators.Property.'+encodeURIComponent(n));indicators[n]=typeof r.Values?.Value==='boolean'?r.Values.Value:null;}catch{indicators[n]=null;}}else{try{const r=await read('get/'+mappings[name].path);fields[name]={value:decode(name,r.Values),at:Date.now()};}catch{fields[name]={value:null,at:Date.now(),error:'Nicht erreichbar'};}}});
+ const indicators={};await boundedMap([...Object.keys(mappings),...indicatorNames.map(n=>'lamp:'+n)],async name=>{if(name.startsWith('lamp:')){const n=name.slice(5);try{const r=await read('get/CurrentDrivableActor/MFA_Indicators.Property.'+encodeURIComponent(n));indicators[n]=typeof r.Values?.Value==='boolean'?r.Values.Value:null;}catch{indicators[n]=null;}}else{fields[name]=await readMappedField(read,mappings[name],values=>decode(name,values));}});
  // Recheck the actor after the sample to avoid mixing values across a vehicle switch.
  const endIdentity=await read('get/CurrentDrivableActor.ObjectClass');if(endIdentity.Values?.ObjectClass!==vehicle)throw Error('Fahrzeugwechsel · erneut verbinden');
  fields.lamps={value:deriveIndicators(indicators),at:Date.now()};
  return {connected:true,supported:true,vehicle,build:info.Meta?.GameBuildNumber,startedAt,updatedAt:Date.now(),fields,message:'Live · Geschwindigkeit, Zug-/Bremskraft, Meldeleuchten und LZB-Zielanzeigen.'};
 }
 
-// Provisional BR 145 mapping: probe only the named read-only contracts already
+// Provisional BR 145 / ICE 1 mappings: probe only named read-only contracts already
 // used by the adapter. A matching response shape is not in-game verification.
 // Failed optional paths are retried after 30 seconds, not on every browser poll.
 const optional145Failures=new WeakMap();
-export async function collect145(read=request){
+export const collect145=(read=request)=>collectProvisional(read,'br145');
+export const collectIce1=(read=request)=>collectIce1Profile(read,{indicatorNames,deriveIndicators});
+export const collectIceT=(read=request)=>collectIce1Profile(read,{indicatorNames,deriveIndicators},{profile:'icet',label:'ICE T',resolveMappings:resolveIceTMappings,decode:decodeIce3,extraLampIds:['GNT'],indicatorOptions:{gnt:true}});
+export const collectIce3=(read=request)=>collectIce1Profile(read,{indicatorNames,deriveIndicators},{profile:'ice3',label:'ICE 3',resolveMappings:resolveIce3Mappings,decode:decodeIce3});
+async function collectProvisional(read,profile){
+ const label='145 Expert',failureCache=optional145Failures;
+ const selectedMappings=mappings;
  const startedAt=Date.now();
  const info=await read('info');
  const actor=await read('get/CurrentDrivableActor.ObjectClass');
  const vehicle=actor.Values?.ObjectClass;
  const fields={};
- if(!liveDisplays(vehicle).includes('br145'))return {connected:true,supported:false,vehicle,fields,updatedAt:Date.now(),message:'145 Expert: aktuelles Fahrzeug nicht als BR 145 erkannt. Live-Werte ausgeblendet.'};
+ if(!liveDisplays(vehicle).includes(profile))return {connected:true,supported:false,vehicle,fields,updatedAt:Date.now(),message:label+': Fahrzeugfamilie nicht erkannt. Live-Werte ausgeblendet.',diagnostics:{profile,mapping:'provisional',vehicle,fields:{},lamps:{},missing:['vehicle']}};
  const identity=await read('get/CurrentDrivableActor.VehicleID');
  const vehicleId=identity.Values?.VehicleID;
  if(typeof vehicleId!=='string'||!vehicleId)throw Error('Unbekannte Fahrzeugidentität');
  const cacheKey=vehicle+':'+vehicleId;
- let cache=optional145Failures.get(read);
- if(!cache||cache.key!==cacheKey){cache={key:cacheKey,failures:new Map()};optional145Failures.set(read,cache);}
+ let cache=failureCache.get(read);
+ if(!cache||cache.key!==cacheKey){cache={key:cacheKey,failures:new Map()};failureCache.set(read,cache);}
  const indicators={};
- const diagnostics={profile:'br145',mapping:'provisional',vehicle,fields:{},lamps:{},missing:[]};
+ const diagnostics={profile,mapping:'provisional',vehicle,fields:{},lamps:{},missing:[]};
  async function optional(route,cacheFailure=true){
   const failedAt=cache.failures.get(route);
   if(cacheFailure&&failedAt!==undefined&&Date.now()-failedAt<30000)return null;
   try{const result=await read(route,{timeoutMs:750,attempts:1});cache.failures.delete(route);return result;}
   catch{if(cacheFailure)cache.failures.set(route,Date.now());return null;}
  }
- const tasks=[...Object.keys(mappings),...indicatorNames.map(n=>'lamp:'+n)];
+ const tasks=[...Object.keys(selectedMappings),...indicatorNames.map(n=>'lamp:'+n)];
  await boundedMap(tasks,async name=>{
   const at=Date.now();
   if(name.startsWith('lamp:')){
@@ -104,11 +114,11 @@ export async function collect145(read=request){
    indicators[property]=typeof response?.Values?.Value==='boolean'?response.Values.Value:null;
    diagnostics.lamps[property]={path,value:indicators[property]};
   }else{
-   const path=mappings[name].path;
-   const response=await optional('get/'+path,name!=='speed'&&name!=='clock');
+   const mapping=selectedMappings[name],path=mapping.path;
+   const response=path?await optional('get/'+path,name!=='speed'&&name!=='clock'):null;
    const value=decode(name,response?.Values);
    fields[name]={value,at,...(value===null?{error:response?'Antwortformat nicht passend':'API-Pfad nicht verfügbar'}:{})};
-   diagnostics.fields[name]={path,key:mappings[name].key,unit:mappings[name].unit||null,value,error:fields[name].error||null};
+   diagnostics.fields[name]={path,key:mapping.key,unit:mapping.unit||null,value,error:fields[name].error||null};
   }
  });
  const after=await read('get/CurrentDrivableActor.ObjectClass');
@@ -120,8 +130,8 @@ export async function collect145(read=request){
  const fresh=f=>f.value!==null&&Date.now()-f.at<=5000;
  for(const [name,field] of Object.entries(fields))if(name!=='lamps'&&!fresh(field))diagnostics.missing.push(name);
  for(const [name,lamp] of Object.entries(fields.lamps.value))if(lamp.on===null||Date.now()-at>5000)diagnostics.missing.push('lamp:'+name);
- const available=Object.keys(mappings).filter(name=>fresh(fields[name]));
+ const available=Object.keys(selectedMappings).filter(name=>fresh(fields[name]));
  const partial=diagnostics.missing.length>0;
- const message='145 Expert · vorläufige Live-Zuordnungen. Verfügbar: '+(available.join(', ')||'keine Messwerte')+'. '+(partial?'Fehlende Werte bleiben ausgeblendet. Bei fehlenden Anzeigen die 145-Diagnose herunterladen.':'Kraft, Melder und LZB bitte mit dem Spiel vergleichen; noch nicht im Spiel verifiziert.');
+ const message=label+' · vorläufige Live-Zuordnungen. Verfügbar: '+(available.join(', ')||'keine Messwerte')+'. '+(partial?'Fehlende Werte bleiben ausgeblendet. Bei fehlenden Anzeigen die Fahrzeugdiagnose herunterladen.':'Kraft, Melder und LZB bitte mit dem Spiel vergleichen; noch nicht im Spiel verifiziert.');
  return {connected:true,supported:true,partial,provisional:true,vehicle,build:info.Meta?.GameBuildNumber,fields,startedAt,updatedAt:Date.now(),diagnostics,message};
 }

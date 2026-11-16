@@ -1,203 +1,147 @@
 # RheinRail TrainOS
 
-**Version 1.1.0** · BR 145 Expert MFA, farbige Leuchtmelder und automatische Fahrzeugfreigabe.
+**Version 1.2.0 · ICE 1, ICE 3 und ICE T**
 
-[Downloads und Releases](https://github.com/RoThorn2711/RheinRail-TrainOS/releases) · [Änderungen in v1.1.0](docs/releases/v1.1.0.md)
+[ZIP herunterladen](https://github.com/RoThorn2711/RheinRail-TrainOS/releases/latest) · [Änderungen in v1.2.0](docs/releases/v1.2.0.md) · [Alle Releases](https://github.com/RoThorn2711/RheinRail-TrainOS/releases)
 
-<p align="center"><img src="docs/brand-banner.svg" width="420" alt="RAINRAIL – Projektlogo"></p>
+<p align="center"><img src="docs/brand-banner.svg" width="420" alt="RheinRail-Projektlogo"></p>
 
-Lokales Companion-Dashboard für **Train Sim World 7**: digitale und analoge BR-101-Expert-Anzeigen, eine GPS-Karte und ein grafisches Hybrid-Streckenband. Ein lokaler HTTP-Adapter liest die verfügbaren Spieldaten und stellt die Oberfläche für PC und Tablets bereit.
+Ein zweiter Führerstand für **Train Sim World 7**: Fahrzeuganzeigen im Browser auf PC und Tablet, dazu der RheinRail Navigator mit GPS-Karte und grafischem Streckenband. Der lokale Adapter liest die TSW HTTP API. Es werden keine Befehle an das Spiel gesendet.
 
-Unabhängiges Fanprojekt. Keine offizielle Anwendung von Dovetail Games, Deutsche Bahn oder dem Fahrzeughersteller. **Experimentell:** Die Entwicklung wurde mit der TSW-7-API, Build 902, und der BR 101 Expert geprüft. Ein vollständiger Ersatz der Spielanzeigen oder eines echten Buchfahrplans ist nicht implementiert.
+Unabhängiges, experimentelles Fanprojekt. Keine offizielle Anwendung von Dovetail Games, Deutsche Bahn oder einem Fahrzeughersteller. Die Anzeigen ersetzen keine realen Führerstandssysteme.
 
-## Funktionen
+## Neu in v1.2.0
 
-| Bereich | Implementierter Umfang |
-| --- | --- |
-| MFD digital | BR-101-inspirierte Hauptanzeige mit Tastenrahmen, Geschwindigkeit, Zug-/elektrischer Bremskraft, ausgewählten PZB-/LZB- und Fahrzeugmeldern |
-| MFA analog | Zwei Rundinstrumente, mittlere LZB-Entfernungsskala und Leuchtmeldertafel |
-| RheinRail Navigator | Reale OpenStreetMap-Hintergrundkarte, TSW-GPS-Position, gemessene Bewegungsausrichtung und GPS-Spur |
-| Kartenbedienung | Verschieben, Mausrad-/Pinch-Zoom, Zoomtasten, Folgen, freier Modus, Vorschau und Zentrieren; Norden bleibt oben |
-| Hybrid-Streckenband V2 | Maßstäbliche relative Signalabstände, verfügbare Geschwindigkeitswechsel und TSW-Zielmarker; 2/5/10/20-km-Zoom, Scrollen, pausierbare Nachführung und drei Größen |
-| Mehrere Geräte | Gemeinsamer lokaler Adapter mit zwischengespeicherten Datenströmen und getrennten Browsereinstellungen |
-| Demo | Einstellbare MFD-/MFA-Simulation sowie deutlich gekennzeichnete anonymisierte Navigator-Aufnahme |
-| Sicherheit | Keine Spiel-Steuerbefehle; der TSW-Schlüssel bleibt im Adapter auf dem PC |
+- **ICE 1:** zwei getrennte Displays, Tacho bis 400 km/h, LZB und Zug-/Bremskraft in kN.
+- **ICE 3:** eigene Tachoskalierung bis 400 km/h und beidseitige Prozentanzeige, ohne Türsymbole.
+- **ICE T:** Tacho bis 240 km/h, Prozentanzeige, GNT, LZB/PZB und Sifa; ohne die nicht bedienbaren unteren Menüreiter.
+- **Demo und Live:** gemeinsame API-Abfrage, Fahrzeugerkennung, getrennte Caches und Komponenten-Diagnosen.
+- Die numerische LZB-Zielentfernung bleibt auch oberhalb von 4.000 m vollständig sichtbar, zum Beispiel **12.800 m**. Nur der Balken endet an seiner Skala.
+- Ausgeschaltete Demo-LZB blendet bei ICE 3 und ICE T auch B und die Beschriftung aus. Live wird die Bereitschaft getrennt behandelt.
 
-Tasten am MFD-Rahmen sind optisch. Displaymenüs, Zugdateneingaben und Fahrzeugbedienung sind nicht implementiert. Die Anwendung verwendet nachgezeichnete Vektorgrafiken, keine extrahierten Spieltexturen.
+Die neuen ICE-Ansichten wurden vom Projektinhaber im Spiel ausprobiert und als funktionsfähig bestätigt. Nicht jeder Zustand und jede Variante ist vollständig geprüft; fehlende Werte bleiben leer.
 
-## Ansichten
+## Anzeigen
 
-Die folgenden Bilder zeigen die selbst entwickelte Weboberfläche, keine Originaltexturen. Das vom Projektinhaber bereitgestellte RAINRAIL-Logo ersetzt das frühere DB-Zeichen. Hinweise zu Marken, Nachbildungen und Logo-Herkunft stehen in [RIGHTS.md](RIGHTS.md).
+| Reiter | Darstellung | Datenquelle |
+| --- | --- | --- |
+| MFD digital | BR 101 Expert ETCS, Tacho, Kraft und Leuchtmelder | Demo / Live |
+| MFA analog | BR 101 Expert ohne ETCS, Rundinstrumente und Leuchtmelder | Demo / Live |
+| 145 Expert | Tacho bis 160 km/h, Kraftinstrument und Meldertafel | Demo / vorläufiges Live-Profil |
+| ICE 1 | Zwei Displays, 400 km/h, LZB und Kraft in kN | Demo / Live |
+| ICE 3 | Zwei Displays, 400 km/h, Fahren und Bremsen in % | Demo / Live |
+| ICE T | Zwei Displays, 240 km/h, Prozentanzeige und GNT | Demo / Live |
+| Navigator | OSM-Karte, TSW-Position und relative Streckenereignisse | Aufnahme / Live |
 
-### MFA analog
+Instrumentengrafiken sind Nachzeichnungen. Zugdateneingaben und Fahrzeugbedienung sind nicht implementiert.
 
-![Analoge MFA im Demo-Modus](docs/screenshots/mfa.jpg)
+### Neue ICE-Ansichten
 
-### MFD digital
+Die Vektorbilder zeigen die Weboberfläche mit simulierten Werten.
 
-![Digitales MFD im Demo-Modus mit RAINRAIL-Projektlogo](docs/screenshots/mfd.jpg)
+**ICE 1**
 
-### Navigator und Streckenband
+![ICE 1 mit Tacho und Kraftdisplay](docs/previews/ice1.svg)
+
+**ICE 3**
+
+![ICE 3 mit Tacho und Prozentanzeige](docs/previews/ice3.svg)
+
+**ICE T**
+
+![ICE T mit 240-km/h-Tacho und GNT](docs/previews/icet.svg)
+
+### BR 101 und Navigator
+
+![Analoge BR-101-MFA](docs/screenshots/mfa.jpg)
+
+![Digitales BR-101-MFD](docs/screenshots/mfd.jpg)
 
 ![Navigator mit grafischem Streckenband](docs/screenshots/navigator.jpg)
 
-Kartengrundlage im Navigator-Bild: © [OpenStreetMap-Mitwirkende](https://www.openstreetmap.org/copyright), ODbL. Die Karte zeigt die reale Welt und kann von TSW abweichen.
+Kartengrundlage: © [OpenStreetMap-Mitwirkende](https://www.openstreetmap.org/copyright), ODbL. Die reale Karte kann vom Spiel abweichen. Marken- und Projekthinweise: [RIGHTS.md](RIGHTS.md), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-## Voraussetzungen
+## Installation und Update
 
-- Windows-PC mit Train Sim World 7 und aktivierter HTTP API für Live-Daten.
-- Die geprüften Instrumentenprofile benötigen die BR 101 Expert.
-- [Node.js](https://nodejs.org/) ab Version 22.
-- Moderner Browser. Für Kartenkacheln und optionale externe Bahnhofsdaten wird Internet benötigt.
-- Tablets im selben lokalen Netzwerk wie der Spiel-PC. Es werden weder Router-Portfreigabe noch Cloud-Hosting benötigt.
+Voraussetzungen: **Node.js ab Version 22**, moderner Browser und für Live TSW 7 auf einem Windows-PC. Zusätzliche npm-Pakete müssen nicht installiert werden.
 
-Es sind keine zusätzlichen npm-Pakete zu installieren. Der Server verwendet Node-Standardmodule; Leaflet ist einschließlich Lizenz lokal mitgeliefert.
+1. ZIP aus den [Releases](https://github.com/RoThorn2711/RheinRail-TrainOS/releases/latest) herunterladen und entpacken.
+2. Beim Update die bisherige TrainOS-Serverinstanz schließen und die neue Version in einen eigenen Ordner entpacken.
+3. Für den PC `Start.cmd` öffnen und [http://localhost:8787](http://localhost:8787) aufrufen.
+4. Für Tablets im selben vertrauenswürdigen Netzwerk `Start-Tablet.cmd` verwenden. Auf dem Tablet die vom Server angezeigte PC-Adresse statt `localhost` öffnen.
+5. Nach einem Update die Browserseite mit **Strg+F5** neu laden.
 
-## Installation und Start unter Windows
+Alternativ: `npm start`. LAN-Betrieb: `node server.mjs --lan`. Beenden mit **Strg+C** im Startfenster. Nur eine Serverinstanz pro Port starten.
 
-1. Dieses Repository herunterladen oder klonen und in einen eigenen Ordner entpacken.
-2. Node.js installieren, falls es noch nicht vorhanden ist.
-3. Für die Nutzung nur auf dem PC **`Start.cmd`** doppelklicken.
-4. Das Startfenster geöffnet lassen und [http://localhost:8787](http://localhost:8787) aufrufen.
-
-Alternativ im Projektordner:
-
-```powershell
-npm start
-```
-
-Ansichten direkt öffnen:
-
-| Ansicht | Adresse auf dem Spiel-PC |
+| Direktansicht | Adresse auf dem Spiel-PC |
 | --- | --- |
-| MFD | `http://localhost:8787/?display=mfd` |
-| MFA | `http://localhost:8787/?display=mfa` |
+| BR 101 MFD | `http://localhost:8787/?display=mfd` |
+| BR 101 MFA | `http://localhost:8787/?display=mfa` |
+| BR 145 | `http://localhost:8787/?display=br145` |
+| ICE 1 | `http://localhost:8787/?display=ice1` |
+| ICE 3 | `http://localhost:8787/?display=ice3` |
+| ICE T | `http://localhost:8787/?display=icet` |
 | Navigator | `http://localhost:8787/?display=navi` |
 
-`/?display=navigator` wird ebenfalls unterstützt. Die Anzeigeauswahl oben wechselt zwischen den Bereichen. Beenden: im Startfenster **Strg+C**. Nur eine Serverinstanz pro Port starten.
+Im LAN-Modus ist die Anzeige für erreichbare Geräte ohne Anmeldung verfügbar. Nur im vertrauenswürdigen privaten Netz verwenden; keine Router-Portfreigabe einrichten. TrainOS ändert keine Firewall-Regeln automatisch.
 
-## TSW HTTP API einrichten
+## TSW HTTP API
 
-Die bisher geprüfte Einrichtung verwendet die Windows-Steam-Version:
+1. In den Steam-Eigenschaften von TSW 7 die Startoption **`-HTTPAPI`** ergänzen und das Spiel neu starten.
+2. Fahrzeug laden und im Führerstand Platz nehmen.
+3. Die vom Spiel erzeugte `CommAPIKey.txt` muss unter `Documents/My Games/TrainSimWorld7/Saved/Config/` im Benutzerprofil liegen.
+4. In TrainOS **TSW Live – nur lesen** wählen.
 
-1. In den Steam-Eigenschaften von TSW 7 die Startoption **`-HTTPAPI`** ergänzen.
-2. TSW neu starten und ein Fahrzeug laden.
-3. Die vom Spiel erzeugte Datei `CommAPIKey.txt` muss unter `Documents/My Games/TrainSimWorld7/Saved/Config/` im Benutzerprofil liegen.
-4. In der Weboberfläche **„TSW Live · nur lesen“** beziehungsweise **„Live“** wählen.
+Der Adapter liest den Schlüssel lokal und sendet ihn nur im `DTGCommKey`-Header an `127.0.0.1:31270`. Ein abweichender Dateipfad kann über `TSW_KEY_FILE` gesetzt werden. **Schlüsseldatei und private Rohdiagnosen niemals ins Repository kopieren.** Andere Launcher und künftige API-Versionen sind nicht pauschal verifiziert.
 
-Der Adapter liest den Schlüssel direkt aus dieser Datei und sendet ihn ausschließlich im `DTGCommKey`-Header an die Spiel-API auf `127.0.0.1:31270`. **Die Schlüsseldatei niemals ins Repository kopieren, in Screenshots zeigen oder weitergeben.** Ein abweichender Dateipfad kann lokal über `TSW_KEY_FILE` gesetzt werden; kein tatsächlicher Schlüssel gehört in eine Konfigurationsdatei des Projekts.
+## Fahrzeugerkennung und Live-Daten
 
-Die Aktivierung in anderen Launchern ist hier nicht verifiziert. API- und Spielupdates können Feldnamen oder Fahrzeugverhalten ändern.
-
-## Tablets und lokales Netzwerk
-
-Für iPad, Galaxy Tab oder einen zweiten Computer **`Start-Tablet.cmd`** verwenden. Alternativ:
-
-```powershell
-node server.mjs --lan
-```
-
-Der Server zeigt die Netzwerkadressen des PCs im Startfenster an. Im Tablet-Browser die angezeigte Adresse verwenden und die gewünschte Ansicht anhängen, beispielsweise `/?display=navi`. Auf dem Tablet bedeutet `localhost` das Tablet selbst – dort muss die Adresse des Spiel-PCs stehen.
-
-Windows muss den Zugriff gegebenenfalls im privaten Netzwerk erlauben. Es wird keine Firewall-Regel automatisch eingerichtet. Im LAN-Modus ist die Anzeige ohne Anmeldung für erreichbare Geräte verfügbar; nur in einem vertrauenswürdigen lokalen Netz verwenden. Keine Router-Portfreigabe einrichten.
-
-Beispielbetrieb: MFD/MFA auf einem Galaxy Tab, Navigator auf einem iPad. Jedes Gerät speichert seine Ansichts- und Navigator-Einstellungen selbst. Der Server fragt das Spiel nicht für jeden Navigator-Browser separat ab. Physischer iPad-/Tab-S8-Parallelbetrieb und echte Touchgesten sind noch nicht vollständig getestet.
-
-## Unterstützte Fahrzeuge und Daten
-
-Für MFD/MFA sind diese beiden tatsächlich geprüften Expert-Kennungen freigeschaltet:
-
-- `RVM_CRG_DB_BR101_C`
-- `RVM_CRG_DB_BR101_ETCS_C`
-
-Andere Varianten erhalten keine geratenen Instrumentenzuordnungen. Der Navigator ist allgemeiner aufgebaut und kann mit anderen Fahrzeugen funktionieren, sofern deren geprüfte Standarddaten verfügbar sind; eine allgemeine Kompatibilitätsgarantie besteht nicht.
-
-Geschwindigkeit, Kraft und Fahrzeugmelder stammen aus den verfügbaren Fahrzeug-Endpunkten. Die Kraftquelle ist asymmetrisch: **positive Kraft pro Fahrmotor, negative elektrische Bremskraft gesamt**. Druckluftbremsdruck wird dadurch nicht dargestellt. Sifa kann auch bei ausgeschalteter Sifa leuchten. Nicht jeder mögliche PZB-/LZB-Störzustand wurde im Spiel ausgelöst und verglichen.
-
-Im Navigator sind **Streckengeschwindigkeit, HUD-Vorgabe und LZB-zulässige Geschwindigkeit getrennte Werte**. Aus einem aktuellen Fahrzeugstatus werden keine LZB-/PZB-Streckenabschnitte abgeleitet. Daten älter als fünf Sekunden werden ausgeblendet; ein Verbindungsverlust schaltet nicht automatisch zur Demo.
-
-## Navigator und Streckenband
-
-Die Karte ist eine reale Hintergrundkarte. Die türkise Spur enthält nur bereits gemessene GPS-Punkte des Zuges, kein vollständiges TSW-Gleisnetz. Die Bewegungsrichtung wird erst nach einer messbaren GPS-Bewegung bekannt. Streckenname und Kilometrierung werden nicht aus dem Ort geschätzt.
-
-Das Streckenband zeigt echte relative Entfernungen. Manuelles Ziehen, Rad-/Trackpad-Scrollen und Touch-Verschieben pausieren die automatische Nachführung. **„Jetzt“** setzt den Ausschnitt auf 0 m zurück. Zoom und Größe werden je Gerät gespeichert.
-
-Farbige Geschwindigkeitsintervalle entstehen ausschließlich zwischen gemeldeten Streckengrenzen. Hinter der letzten bekannten Grenze bleibt der Bereich unbekannt. Temporäre Beschränkungen werden nicht als allgemeines Streckentempo fortgeschrieben. Ohne Abschnittsdaten bleibt die LZB-/PZB-Zeile als unbekannt gekennzeichnet.
-
-Antippbare Ereignisse öffnen eine Infokarte. Nur Objekte mit einer bestätigten GPS-Position dürfen die Karte zentrieren. Signalpositionen aus lokalen Spielkoordinaten werden nicht in geratene GPS-Punkte umgewandelt.
-
-Optionale OSM-Bahnhöfe sind reale Objekte, keine bestätigten TSW-Zuordnungen. Öffentliche Abfragedienste können ausfallen. Für Fulda liegt eine einzelne, ausdrücklich gekennzeichnete OSM-Referenz bei; es ist kein vollständiges Bahnhofsverzeichnis enthalten.
-
-## Demo-Modus
-
-- **MFD/MFA:** „Demo“ auswählen und unter Einstellungen Geschwindigkeit, Kraft und Sifa-Anzeige verändern. Die Werte sind simuliert.
-- **Navigator:** „Aufnahme / Demo“ zeigt eine gespeicherte, anonymisierte API-Messung. Das ist keine laufende Fahrt und keine Live-Position. Die Karte benötigt weiterhin Internet.
-
-Die enthaltenen Testdaten sind auf erforderliche Messfelder reduziert. Originaldiagnosen, Benutzernamen, Sitzungskennungen, Schlüssel und lokale Pfade gehören nicht zum Projektpaket.
-
-## Projektstruktur
-
-```text
-dist/
-  profiles/             MFD- und MFA-Vektordarstellungen
-  app.js, sources.js    Instrumentenoberfläche und Datenquellen
-  navi.*                Eigenständige Navigator-Seite
-  route-strip.*         Grafisches Streckenband V2
-  strip-model.js        Maßstab und sichere Geschwindigkeitsintervalle
-  vendor/               Leaflet 1.9.4 mit BSD-2-Clause-Lizenz
-data/                   Öffentliche OSM-Referenzdaten
-test/fixtures/          Minimierte, bereinigte Testwerte
-docs/screenshots/       Bilder der selbst entwickelten Weboberfläche
-telemetry.mjs           Fahrzeugbezogene API-Zuordnungen
-navigation.mjs          GPS, Ereignisse und optionale OSM-Abfrage
-server.mjs              Lokaler Webserver und gemeinsamer Adapter-Cache
-*.test.mjs              Node-Tests
-Start*.cmd              Windows-Startdateien
-```
-
-Die verwendeten API-Felder und Datenregeln sind in [docs/API.md](docs/API.md) dokumentiert.
-
-## Tests
-
-```powershell
-npm test
-```
-
-Die Tests laufen ohne TSW, echte Schlüsseldatei oder zusätzliche Pakete. Sie prüfen unter anderem Einheiten, ungültige und veraltete Werte, Fahrzeugwechsel, beide Expert-Kennungen, die Instrumentenanzeige, Blinklogik, GPS-Kursberechnung und die maßstäbliche Platzierung sowie begrenzte Geschwindigkeitsintervalle im Streckenband.
-
-Version 1.1.0 enthält **35 bestandene Node-Tests**. Die neuen 145- und Fahrzeugfreigabeprüfungen verwenden synthetische API-Antworten. Browserprüfungen ersetzen keinen vollständigen Fahr-, Geräte- oder Langzeittest.
-
-## Bekannte Probleme und geplante Erweiterungen
-
-- Kein vollständiges TSW-Gleisnetz und keine gesicherte Streckenkilometrierung.
-- Keine bestätigten geografischen Signalpositionen, vollständigen Bahnhofsdaten oder LZB-/PZB-Abschnittsgrenzen.
-- Einzelne Fahrzeugmelder und ungewöhnliche PZB-/LZB-Zustände müssen weiter verglichen werden; nicht belegte Melder bleiben dunkel.
-- Abweichungen der realen OSM-Karte vom Spiel sind möglich. Externe Bahnhofsdienste sind experimentell und nicht immer erreichbar.
-- Kartenrotation, importierbare Streckenprofile und ICE-Displays sind noch nicht implementiert.
-- Geplant sind weitere bestätigte Fahrzeugprofile, Streckenprofile und zusätzliche Geräte-/Langzeittests. Es gibt dafür keine zugesagte Unterstützung oder Terminplanung.
-
-## Lizenzstatus
-
-Für den projektspezifischen Code ist zunächst **keine allgemeine Open-Source-Lizenz erteilt**. Die Rechte an Marken, Nachbildungen und Referenzmaterial sind separat zu prüfen; eine fehlende Projektlizenz klärt diese Rechte nicht. Als spätere Lizenz für die eigenen, geklärten Codebestandteile wird MIT vorgeschlagen.
-
-Leaflet behält seine BSD-2-Clause-Lizenz, OSM-Inhalte ihre jeweiligen Bedingungen. Siehe [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) und [RIGHTS.md](RIGHTS.md). Die Sichtbarkeit auf GitHub allein macht das Projekt nicht zu frei lizenzierter Open-Source-Software.
-
-## 145 Expert
-
-In der Anzeigeauswahl `145 Expert` wählen. Demo bietet Geschwindigkeit, Kraft, Sifa und LZB-Zielwerte. `TSW Live` fragt zusätzlich zu Geschwindigkeit/Spielzeit die benannten lesenden Verträge für Kraft, ZS, Sifa, PZB-/LZB-Leuchtmelder und LZB-Zielanzeigen ab. Die Zuordnung ist **vorläufig und noch nicht mit echten BR-145-API-Antworten verifiziert**; sie verwendet bekannte Verträge der bestehenden Instrumentenanbindung. Nicht angebotene oder ungültige Werte bleiben leer. Tür-, Hauptschalter-, Notbrems- und elektrische Bremsmelder haben noch keine bestätigte Zuordnung.
-
-Nach einem Update die alte Serverinstanz schließen und `Start.cmd` erneut starten. Stimmen Live-Anzeigen nicht oder bleiben Werte unverfügbar: unter Einstellungen `145-Diagnose herunterladen` wählen. Die Datei enthält nur ausgewählte API-Felder/Messwerte und die Fahrzeugklasse; keinen Schlüssel oder Benutzerpfad. Sie dient dazu, die tatsächlich benötigten 145-Zuordnungen zu bestimmen.
-
-Aktuelle lokale Prüfung: 35 bestandene Node-Tests sowie Browserprüfungen mit synthetischen API-Antworten (Live/Demo, Kraft, Sifa, Melder, LZB, Verbindungsverlust, Diagnose-Download). Ein echter TSW-Fahrtest steht aus.
-
-## Automatische Fahrzeugfreigabe im Live-Modus
-
-| TSW-Fahrzeugkennung | Freigegebene Instrumentenansicht |
+| Gemeldete Fahrzeugfamilie | Instrumentenprofil |
 | --- | --- |
 | `RVM_CRG_DB_BR101_ETCS_C` | BR 101 MFD |
 | `RVM_CRG_DB_BR101_C` | BR 101 MFA |
-| Klasse mit der Baureihennummer `145` (auch NV) | 145 Expert MFA |
+| Baureihe 145, einschließlich passender NV-Klassennamen | 145 Expert |
+| ICE 1 / BR 401 | ICE 1 |
+| ICE 3 / BR 403 oder 406 | ICE 3 |
+| ICE T / BR 411 oder 415 | ICE T |
 
-Im Live-Modus wechselt die Instrumentenseite automatisch zur passenden Ansicht. Andere Instrumentenoptionen werden deaktiviert; der Navigator bleibt erreichbar. Dieselben Freigaben gelten im Navigator-Menü und in den API-Antworten bei direkten Profilanfragen. Ohne aktuelle Fahrzeugerkennung bleiben Instrumentenoptionen gesperrt. Demo lässt alle Ansichten frei auswählbar.
+Die Erkennung unterscheidet Fahrzeugfamilien und garantiert nicht jede Variante. Bei erkanntem Fahrzeugwechsel aktiviert TrainOS die passende Ansicht. Falsche Profilanfragen erhalten keine fremden Instrumentendaten. Daten älter als fünf Sekunden werden ausgeblendet. Ein Verbindungsverlust wechselt nicht automatisch zur Demo.
 
-Die beiden 101-Kennungen sind aus vorhandenen Fahrzeugaufnahmen bekannt. Für die normalen und NV-145-Varianten sind die vollständigen realen Klassennamen noch nicht separat aufgezeichnet; getestet wurden synthetische Klassennamen mit `145` beziehungsweise `145_NV`. Sollte eine Variante gesperrt bleiben, ist die tatsächliche Fahrzeugklasse zur Ergänzung erforderlich.
+Die BR-101-Kraftquelle zeigt positive Zugkraft pro Fahrmotor und negative elektrische Bremskraft gesamt. Beim ICE 1 ist der genaue Skalenbezug des aggregierten Kraftwerts weiter zu vergleichen. ICE 3 und ICE T übernehmen nur ausdrücklich als Prozent benannte Messwerte; kN oder Hebelstellungen werden nicht als Prozent umgedeutet. Die 145-Zuordnungen bleiben vorläufig.
+
+Beim ICE T werden **GNT eingeschaltet**, **GNT bereit** und **GNT-Überwachung aktiv** getrennt gelesen. Direkte GNT-Leuchtmelder haben Vorrang; andernfalls verwendet die blaue Anzeige vorläufig den Einschaltzustand. Nicht jeder Übergang und Störzustand ist geprüft.
+
+Fehlende oder abweichende Werte: Unter **Einstellungen** die jeweilige Komponenten-Diagnose herunterladen. Sie enthält ausgewählte Messpfade, Werte und Fahrzeugklasse, keinen API-Schlüssel oder VehicleID. Die Rohdatei bleibt außerhalb des Projektpakets.
+
+Details: [API](docs/API.md) · [ICE 1](docs/ice1-demo.md) · [ICE 3](docs/ice3.md) · [ICE T](docs/icet.md).
+
+## Navigator und Streckenband
+
+Der Navigator verbindet eine reale OpenStreetMap-Karte mit TSW-GPS-Daten. Die Spur enthält gemessene Zugpositionen, kein vollständiges TSW-Gleisnetz. Die Fahrtrichtung entsteht aus Bewegung; Streckenname und Kilometrierung werden nicht geschätzt.
+
+Das Streckenband zeigt relative Signalabstände, Geschwindigkeitswechsel und Zielmarker. Scrollen und Ziehen pausieren die Nachführung; **Jetzt** setzt sie zurück. Geschwindigkeitsintervalle entstehen nur zwischen gemeldeten Grenzen. Streckengeschwindigkeit, HUD-Vorgabe und LZB-Vorgabe bleiben getrennte Werte. Eine vollständige EBuLa ist nicht implementiert.
+
+Kartenkacheln und optionale Bahnhofsdaten benötigen Internet. Externe Dienste können ausfallen. Kartenrotation und importierbare Streckenprofile sind nicht implementiert.
+
+## Demo und Tests
+
+Ohne Spiel **Demo** wählen. Unter Einstellungen lassen sich Geschwindigkeit, Kraft beziehungsweise Prozentwert, Sifa, PZB und LZB verändern. Beim ICE T ist GNT separat schaltbar. Der Navigator besitzt eine gekennzeichnete anonymisierte Aufnahme.
+
+`npm test` führt **60 Node-Tests** ohne Spiel, Schlüsseldatei oder zusätzliche Pakete aus. Sie prüfen Einheiten, bekannte Komponentenpfade, fehlende und veraltete Werte, Fahrzeugwechsel, Profilfreigaben, Melder, ICE-Skalen und Navigator-Daten. Automatisierte Prüfungen ersetzen keinen vollständigen Fahr-, Geräte- oder Langzeittest.
+
+## Projektstruktur
+
+| Pfad | Inhalt |
+| --- | --- |
+| `dist/profiles/` | Instrumente und ICE-Displays |
+| `dist/app.js`, `dist/sources.js` | Oberfläche, Demo und Live-Normalisierung |
+| `telemetry.mjs`, `telemetry-read.mjs` | Authentifizierter API-Leser und gemeinsame Abfragen |
+| `ice*-*.mjs`, `icet-mappings.mjs` | ICE-Messpfade, Melder und Diagnose |
+| `server.mjs` | Webserver und getrennte Profil-Caches |
+| `navigation.mjs`, `dist/navi.*` | Navigator und Streckenband |
+| `test/fixtures/`, `*.test.mjs` | Minimierte Testaufnahmen und Tests |
+| `docs/` | Datenregeln, Ansichten und Release-Hinweise |
+
+## Lizenzstatus
+
+Für projektspezifischen Code ist noch **keine allgemeine Open-Source-Lizenz erteilt**. Die öffentliche Sichtbarkeit auf GitHub begründet keine freie Lizenz. Leaflet behält seine BSD-2-Clause-Lizenz; OSM-Inhalte unterliegen ihren jeweiligen Bedingungen. Siehe [RIGHTS.md](RIGHTS.md) und [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

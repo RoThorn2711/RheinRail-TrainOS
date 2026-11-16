@@ -1,14 +1,14 @@
 import {restrictLiveState} from './vehicle-profiles.js';
 export class DemoSource{
- constructor(){this.speed=0;this.force=0;this.sifa=true;this.start=Date.now();this.lzbActive=false;this.lzbDistance=1000;this.lzbTargetSpeed=80;}
- async read(){const d=new Date(Date.UTC(2000,0,1,10,0,25)+(Date.now()-this.start));return {demo:true,lzbActive:this.lzbActive,lzbShowDistance:this.lzbActive,lzbDistance:this.lzbDistance,lzbTargetSpeed:this.lzbTargetSpeed,lzbPermittedSpeed:this.lzbTargetSpeed,speed:this.speed,force:this.force,sifa:this.sifa,zsOff:true,highBrake:true,lamps:Object.fromEntries(['55','70','85','B','U','Ende','E40','V40','H','EL','Befehl40','Hz1000','Hz500','G','S','Stoer'].map(n=>[n,{on:['85','B','U'].includes(n),flash:false,inverted:false}])),clock:d.toISOString().slice(11,19),status:'DEMO',message:'Demo-Modus · alle Werte sind simuliert.'};}
+ constructor(){this.speed=0;this.force=0;this.sifa=true;this.gntActive=true;this.start=Date.now();this.lzbActive=false;this.lzbDistance=1000;this.lzbTargetSpeed=80;}
+ async read(){const d=new Date(Date.UTC(2000,0,1,10,0,25)+(Date.now()-this.start));return {demo:true,gntActive:this.gntActive,lzbActive:this.lzbActive,lzbShowDistance:this.lzbActive,lzbDistance:this.lzbDistance,lzbTargetSpeed:this.lzbTargetSpeed,lzbPermittedSpeed:this.lzbTargetSpeed,speed:this.speed,force:this.force,sifa:this.sifa,zsOff:true,highBrake:true,lamps:Object.fromEntries(['55','70','85','B','U','Ende','E40','V40','H','EL','Befehl40','Hz1000','Hz500','G','S','Stoer'].map(n=>[n,{on:['55','70','85'].includes(n)?n===(this.pzbType||'85'):['Hz1000','Hz500','Befehl40'].includes(n)?this.pzbExtra?.[n]===true:['B','U'].includes(n),flash:['55','70','85'].includes(n)&&this.pzbFlash===true,inverted:false}])),clock:d.toISOString().slice(11,19),status:'DEMO',message:'Demo-Modus · alle Werte sind simuliert.'};}
 }
 export function normalizeLive(raw,now=Date.now()){
- const data={demo:false,speed:null,force:null,sifa:null,zsOff:null,highBrake:null,clock:null,lamps:null,lzbActive:null,lzbShowDistance:null,lzbDistance:null,lzbTargetSpeed:null,lzbPermittedSpeed:null,status:'VERBINDUNG…',message:raw.message||'Warte auf TSW',raw};
+ const data={demo:false,speed:null,force:null,forcePercent:null,vehicleMaxSpeed:null,gntActive:null,gntEnabled:null,gntReady:null,gntMonitoringActive:null,sifa:null,zsOff:null,highBrake:null,clock:null,lamps:null,lzbActive:null,lzbShowDistance:null,lzbDistance:null,lzbTargetSpeed:null,lzbPermittedSpeed:null,status:'VERBINDUNG…',message:raw.message||'Warte auf TSW',raw};
  if(!raw.connected){data.status=raw.pending?'VERBINDUNG…':'OFFLINE';return data;}
  if(now-raw.updatedAt>5000){data.status='DATEN VERALTET';return data;}
  if(!raw.supported){data.status='ANDERES FAHRZEUG';return data;}
- for(const name of ['speed','force','sifa','zsOff','highBrake','clock','lamps','lzbActive','lzbShowDistance','lzbDistance','lzbTargetSpeed','lzbPermittedSpeed']){const f=raw.fields?.[name];if(f&&now-f.at<=5000)data[name]=f.value;}
+ for(const name of ['speed','force','forcePercent','vehicleMaxSpeed','gntActive','gntEnabled','gntReady','gntMonitoringActive','sifa','zsOff','highBrake','clock','lamps','lzbActive','lzbShowDistance','lzbDistance','lzbTargetSpeed','lzbPermittedSpeed']){const f=raw.fields?.[name];if(f&&now-f.at<=5000)data[name]=f.value;}
  const fresh=Object.values(raw.fields||{}).some(f=>f.value!==null&&f.value!==undefined&&now-f.at<=5000&&typeof f.value!=='object');
  data.status=now-raw.updatedAt>5000?'DATEN VERALTET':!fresh?'KEINE MESSWERTE':raw.partial?'LIVE · TEILDATEN':raw.provisional?'LIVE · VORLÄUFIG':'LIVE';return data;
 }
